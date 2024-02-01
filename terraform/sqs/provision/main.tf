@@ -6,8 +6,8 @@ module "sqs" {
 
   create_dlq              = false
   create_dlq_queue_policy = false
-  redrive_policy          = ""
-  redrive_allow_policy    = ""
+  redrive_policy          = {}
+  redrive_allow_policy    = {}
 
   fifo_queue = false
 }

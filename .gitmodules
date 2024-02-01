@@ -1,0 +1,4 @@
+[submodule "terraform/sqs/community"]
+	path = terraform/sqs/community
+	url = git@github.com:fnaranjo-vmw/terraform-aws-sqs.git
+	branch = master

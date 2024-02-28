@@ -1,7 +1,7 @@
 terraform {
   required_providers {
     csbmysql = {
-      source  = "cloud-service-broker/csbmysql"
+      source  = "registry.terraform.io/cloud-service-broker/csbmysql"
       version = ">= 1.0.0"
     }
     random = {

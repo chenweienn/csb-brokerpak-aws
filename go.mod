@@ -112,7 +112,7 @@ require (
 	go.opencensus.io v0.24.0 // indirect
 	go.uber.org/atomic v1.9.0 // indirect
 	go.uber.org/multierr v1.9.0 // indirect
-	golang.org/x/crypto v0.19.0 // indirect
+	golang.org/x/crypto v0.20.0 // indirect
 	golang.org/x/exp/typeparams v0.0.0-20221208152030-732eee02a75a // indirect
 	golang.org/x/mod v0.15.0 // indirect
 	golang.org/x/net v0.21.0 // indirect
@@ -134,3 +134,5 @@ require (
 	gorm.io/driver/sqlite v1.4.4 // indirect
 	gorm.io/gorm v1.25.7 // indirect
 )
+
+replace github.com/cloudfoundry/cloud-service-broker => /Users/mcampo/workspace/csb/csb-brokerpak-aws/../cloud-service-broker

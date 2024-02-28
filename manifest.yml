@@ -8,8 +8,8 @@ platforms:
   arch: amd64
 # - os: darwin
 #   arch: amd64
-# terraform_upgrade_path:
-# - version: 1.6.1
+terraform_upgrade_path:
+ - version: 1.6.1
 terraform_binaries:
 - name: tofu
   version: 1.6.1

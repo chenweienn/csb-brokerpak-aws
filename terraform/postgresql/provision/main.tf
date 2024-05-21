@@ -59,7 +59,7 @@ resource "aws_db_instance" "db_instance" {
   db_name                               = var.db_name
   username                              = random_string.username.result
   password                              = var.use_managed_admin_password ? null : random_password.password.result
-  manage_master_user_password           = var.use_managed_admin_password
+  manage_master_user_password           = var.use_managed_admin_password ? true : null
   parameter_group_name                  = length(var.parameter_group_name) == 0 ? aws_db_parameter_group.db_parameter_group[0].name : var.parameter_group_name
   tags                                  = var.labels
   vpc_security_group_ids                = local.rds_vpc_security_group_ids
@@ -98,6 +98,7 @@ resource "aws_db_instance" "db_instance" {
 }
 
 resource "aws_secretsmanager_secret_rotation" "secret_manager" {
+  count               = var.use_managed_admin_password ? 1 : 0
   secret_id           = aws_db_instance.db_instance.master_user_secret[0].secret_arn
 
   rotation_rules {

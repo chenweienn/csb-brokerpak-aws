@@ -1,0 +1,81 @@
+instance_groups:
+- azs: ((azs))
+  instances: 1
+  update:
+    max_in_flight: 1
+  vm_type: t3a.medium
+  name: deploy-all
+  stemcell: bosh-aws-xen-hvm-ubuntu-jammy-go_agent
+  networks:
+  - default:
+    - dns
+    - gateway
+    name: ((env_name))-services-subnet
+  jobs:
+  - consumes: {}
+    name: cf-cli-8-linux
+    provides: {}
+    release: cf-cli
+  - consumes: {}
+    name: bpm
+    provides: {}
+    release: bpm
+  - consumes: {}
+    provides:
+      csb:
+        aliases:
+        - domain: '((broker_bosh_dns_domain))'
+          health_filter: "healthy"
+    name: csb-app
+    properties:
+      broker: ((broker))
+
+      cf: ((cf))
+
+     #tlsCa: ((csb_tls.ca))
+     #tlsCert: ((csb_tls.certificate))
+     #tlsKey: ((csb_tls.private_key))
+      config:
+        api: ((api))
+        aws: ((aws))
+        brokerpak: ((brokerpak))
+        compatibility: ((compatibility))
+        credhub: ((credhub))
+        db: ((db))
+        provision: ((provision))
+        request: ((request))
+        service: ((service))
+    release: csb-aws
+  
+name: ((name))
+releases:
+- name: cf-cli
+  version: "1.66.0"
+  url: "https://bosh.io/d/github.com/bosh-packages/cf-cli-release?v=1.66.0"
+  sha1: "106abc5b08e76dcc0c9b2adb332fe8802136619e"
+- name: csb-aws
+  url: file://((release_repo_path))
+  version: create
+- name: bpm
+  version: latest
+variables:
+- name: csb_tls
+  type: certificate
+  update_mode: converge
+  options:
+    ca: /services/tls_ca
+    common_name: ((broker_bosh_dns_domain))
+    alternative_names:
+    - ((broker_bosh_dns_domain))
+stemcells:
+- alias: bosh-aws-xen-hvm-ubuntu-jammy-go_agent
+  name: bosh-aws-xen-hvm-ubuntu-jammy-go_agent
+  os: ubuntu-jammy
+  version: latest
+update:
+  canaries: 1
+  canary_watch_time: 30000-300000
+  max_errors: 2
+  max_in_flight: 1
+  serial: true
+  update_watch_time: 30000-300000

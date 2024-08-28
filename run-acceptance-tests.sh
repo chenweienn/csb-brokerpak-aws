@@ -18,6 +18,8 @@ ENVIRONMENT_LOCK_METADATA=${ENVIRONMENT_LOCK_METADATA:-environment/metadata}
 ENV_NAME=$(jq .name -r < "${ENVIRONMENT_LOCK_METADATA}")
 # shellcheck disable=1090
 source <(smith om -l "${ENVIRONMENT_LOCK_METADATA}")
+# shellcheck disable=1090
+source <(smith bosh -l "${ENVIRONMENT_LOCK_METADATA}")
 smith -l "${ENVIRONMENT_LOCK_METADATA}" cf-login <<< "${ORG}" &> /dev/null
 DB_PASSWORD="$(echo "${ENV_NAME}" | sha256sum | cut -f1 -d' ')"
 ENCRYPTION_PASSWORDS='[{"password": {"secret":"'${DB_PASSWORD}'"},"label":"first-encryption","primary":true}]'
@@ -46,7 +48,7 @@ CH_UAA_CLIENT_SECRET="$(echo "${UAA_CREDS}" | jq -r .credential.value.password)"
 CH_UAA_URL="https://uaa.service.cf.internal:8443"
 CH_CRED_HUB_URL="https://credhub.service.cf.internal:8844"
 AWS_PAS_VPC_ID="$(jq -r .pas_vpc_id "${ENVIRONMENT_LOCK_METADATA}")"
-
+export AWS_PAS_VPC_ID
 CF_API_PASS=$( credhub get --key password -n "/opsmgr/$CF_DEPLOYMENT_ID/uaa/admin_credentials" -j )
 
 
@@ -152,6 +154,9 @@ service:
       ${GSB_SERVICE_CSB_AWS_SQS_PLANS}
 
 EOF
+bosh -d cloud-service-broker-aws-d7d1fb61212b1a66aabe deploy ./acceptance-tests/assets/manifest.yml  -l ./acceptance-tests/assets/vars.yml -v name=cloud-service-broker-aws-d7d1fb61212b1a66aabe -v release_repo_path="$(pwd)/../csb-aws-release/" --no-redact -n
+
 exit 0
+
 #ginkgo -r acceptance-tests/
 

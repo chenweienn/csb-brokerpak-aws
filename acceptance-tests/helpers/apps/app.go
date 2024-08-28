@@ -2,12 +2,12 @@
 package apps
 
 type App struct {
+	dir       dir
 	Name      string
 	URL       string
-	start     bool
 	buildpack string
 	memory    string
 	disk      string
 	manifest  string
-	dir       dir
+	start     bool
 }

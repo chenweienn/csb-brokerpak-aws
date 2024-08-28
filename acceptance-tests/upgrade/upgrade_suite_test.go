@@ -14,6 +14,7 @@ var (
 	fromVersion         string
 	developmentBuildDir string
 	releasedBuildDir    string
+  boshReleaseDir      string
 )
 
 func init() {

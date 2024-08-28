@@ -51,7 +51,11 @@ func WithName(name string) Option {
 		b.Name = name
 	}
 }
-
+func WithVM() Option {
+  return func(b *Broker) {
+    b.isVmBased = true
+  }
+}
 func WithPrefix(prefix string) Option {
 	return func(b *Broker) {
 		b.Name = random.Name(random.WithPrefix(prefix))
@@ -68,6 +72,12 @@ func WithSourceDir(dir string) Option {
 func WithEnv(env ...apps.EnvVar) Option {
 	return func(b *Broker) {
 		b.envExtras = append(b.envExtras, env...)
+	}
+}
+
+func WithBoshReleaseDir(dir string) Option {
+	return func(b *Broker) {
+		b.boshReleaseDir = dir
 	}
 }
 

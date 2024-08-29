@@ -1,10 +1,11 @@
 package upgrade_test
 
 import (
-	"csbbrokerpakaws/acceptance-tests/helpers/brokerpaks"
 	"flag"
 	"os"
 	"testing"
+
+	"csbbrokerpakaws/acceptance-tests/helpers/brokerpaks"
 
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
@@ -14,7 +15,7 @@ var (
 	fromVersion         string
 	developmentBuildDir string
 	releasedBuildDir    string
-  boshReleaseDir      string
+	boshReleaseDir      string
 )
 
 func init() {
@@ -36,9 +37,10 @@ var _ = BeforeSuite(func() {
 
 		releasedBuildDir = brokerpaks.DownloadBrokerpak(fromVersion, brokerpaks.TargetDir(fromVersion))
 	}
-
-	preflight(developmentBuildDir) // faster feedback as no download
-	preflight(releasedBuildDir)
+	if os.Getenv("UPGRADE_TO_VM") != "true" {
+		preflight(developmentBuildDir) // faster feedback as no download
+		preflight(releasedBuildDir)
+	}
 })
 
 // preflight checks that a specified broker dir is viable so that the user gets fast feedback

@@ -1,6 +1,8 @@
 package upgrade_test
 
 import (
+	"os"
+
 	"csbbrokerpakaws/acceptance-tests/helpers/apps"
 	"csbbrokerpakaws/acceptance-tests/helpers/brokers"
 	"csbbrokerpakaws/acceptance-tests/helpers/random"
@@ -15,9 +17,9 @@ var _ = Describe("UpgradeS3Test", Label("upgrade", "s3"), func() {
 		It("should continue to work", func() {
 			By("deploying latest release with the updated pak")
 			serviceBroker := brokers.Create(
-        brokers.WithVM(),
+				brokers.WithVM(),
 				brokers.WithPrefix("csb-upgrade"),
-				brokers.WithBoshReleaseDir(boshReleasedDir),
+				brokers.WithBoshReleaseDir(""),
 				brokers.WithReleaseEnv(releasedBuildDir),
 			)
 			defer serviceBroker.Delete()
@@ -99,8 +101,18 @@ var _ = Describe("UpgradeS3Test", Label("upgrade", "s3"), func() {
 			appOne.DELETE(blobNameTwo)
 		})
 	})
+	Context("testing", func() {
+		//FIt("should continue to work", func() {
+		//	boshReleasedDir := os.Getenv("BROKER_RELEASE_PATH")
+		//	serviceBroker := brokers.CreateVm(
+		//		brokers.WithVM(),
+		//		brokers.WithBoshReleaseDir(boshReleasedDir),
+		//	)
+		//	serviceBroker.UpdateBrokerToVmBroker()
+		//})
+	})
 	Context("When upgrading broker version", func() {
-		It("should continue to work", func() {
+		FIt("should continue to work", func() {
 			By("pushing latest released broker version")
 			serviceBroker := brokers.Create(
 				brokers.WithPrefix("csb-upgrade"),
@@ -136,8 +148,18 @@ var _ = Describe("UpgradeS3Test", Label("upgrade", "s3"), func() {
 			got := appTwo.GET(blobNameOne).String()
 			Expect(got).To(Equal(blobDataOne))
 
-			By("pushing the development version of the broker")
-			serviceBroker.UpdateBroker(developmentBuildDir)
+			//		if os.Getenv("UPGRADE_TO_VM") == "true" {
+			boshReleasedDir := os.Getenv("BROKER_RELEASE_PATH")
+			serviceBroker = brokers.CreateVm(
+				brokers.WithVM(),
+				brokers.WithName(serviceBroker.Name),
+				brokers.WithBoshReleaseDir(boshReleasedDir),
+			)
+			serviceBroker.UpdateBrokerToVmBroker()
+			//		} else {
+			//			By("pushing the development version of the broker")
+			//			serviceBroker.UpdateBroker(developmentBuildDir)
+			//		}
 
 			By("upgrading the service instance")
 			serviceInstance.Upgrade()

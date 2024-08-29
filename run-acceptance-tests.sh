@@ -83,7 +83,7 @@ broker:
   enable_global_access_to_plans: true
   name: cloud-service-broker-aws
   password: broker-test
-  url: api.cloud-service-broker.service.internal
+  url: ((name)).cloud-service-broker.service.internal
 
 
 cf:
@@ -137,15 +137,27 @@ service:
   csb-aws-mssql:
     plans: |+
       ${GSB_SERVICE_CSB_AWS_MSSQL_PLANS}
+    provision:
+      defaults: |+
+        ${GSB_PROVISION_DEFAULTS}
   csb-aws-mysql:
     plans: |+
       ${GSB_SERVICE_CSB_AWS_MYSQL_PLANS}
+    provision:
+      defaults: |+
+        ${GSB_PROVISION_DEFAULTS}
   csb-aws-postgresql:
     plans: |+
       ${GSB_SERVICE_CSB_AWS_POSTGRESQL_PLANS}
+    provision:
+      defaults: |+
+        ${GSB_PROVISION_DEFAULTS}
   csb-aws-redis:
     plans: |+
       ${GSB_SERVICE_CSB_AWS_REDIS_PLANS}
+    provision:
+      defaults: |+
+        ${GSB_PROVISION_DEFAULTS}
   csb-aws-s3-bucket:
     plans: |+
       ${GSB_SERVICE_CSB_AWS_S3_BUCKET_PLANS}

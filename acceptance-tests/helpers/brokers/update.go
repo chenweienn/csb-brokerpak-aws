@@ -1,10 +1,20 @@
 package brokers
 
 import (
+	"fmt"
+	"slices"
+
 	"csbbrokerpakaws/acceptance-tests/helpers/apps"
 	"csbbrokerpakaws/acceptance-tests/helpers/cf"
-	"slices"
 )
+
+func (b *Broker) Hostname() string {
+	return fmt.Sprintf("http://%s.cloud-service-broker.service.internal:8080", b.Name)
+}
+
+func (b *Broker) UpdateBrokerToVmBroker() {
+	cf.Run("update-service-broker", b.Name, b.username, b.password, b.Hostname())
+}
 
 func (b *Broker) UpdateBroker(dir string, env ...apps.EnvVar) {
 	b.envExtras = slices.Concat(b.envExtras, b.latestEnv(), env)

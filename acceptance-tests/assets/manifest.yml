@@ -24,7 +24,7 @@ instance_groups:
     provides:
       csb:
         aliases:
-        - domain: '((broker_bosh_dns_domain))'
+        - domain: ((name)).csb.internal
           health_filter: "healthy"
     name: csb-app
     properties:
@@ -64,9 +64,9 @@ variables:
   update_mode: converge
   options:
     ca: /services/tls_ca
-    common_name: ((broker_bosh_dns_domain))
+    common_name: ((name)).csb.internal
     alternative_names:
-    - ((broker_bosh_dns_domain))
+    - ((name)).csb.internal
 stemcells:
 - alias: bosh-aws-xen-hvm-ubuntu-jammy-go_agent
   name: bosh-aws-xen-hvm-ubuntu-jammy-go_agent

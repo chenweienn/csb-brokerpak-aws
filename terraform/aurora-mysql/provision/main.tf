@@ -24,6 +24,7 @@ resource "random_string" "username" {
   length  = 16
   special = false
   numeric = false
+  count = length(var.admin_username) == 0 ? 1 : 0
 }
 
 resource "random_password" "password" {
@@ -39,7 +40,7 @@ resource "aws_rds_cluster" "cluster" {
   engine_version                  = var.engine_version
   database_name                   = var.db_name
   tags                            = var.labels
-  master_username                 = random_string.username.result
+  master_username                 = length(var.admin_username) == 0 ? random_string.username[0].result : var.admin_username
   master_password                 = random_password.password.result
   port                            = local.port
   db_subnet_group_name            = local.subnet_group
@@ -71,7 +72,7 @@ resource "aws_rds_cluster" "cluster" {
 }
 
 resource "aws_rds_cluster_instance" "cluster_instances" {
-  count                                 = var.cluster_instances
+  count                                 = var.imported_from_legacy_broker ? 0 : var.cluster_instances
   identifier                            = "${var.instance_name}-${count.index}"
   cluster_identifier                    = aws_rds_cluster.cluster.id
   tags                                  = var.labels
@@ -80,6 +81,7 @@ resource "aws_rds_cluster_instance" "cluster_instances" {
   engine_version                        = aws_rds_cluster.cluster.engine_version
   db_subnet_group_name                  = local.subnet_group
   auto_minor_version_upgrade            = var.auto_minor_version_upgrade
+  copy_tags_to_snapshot                 = var.copy_tags_to_snapshot
   monitoring_interval                   = var.monitoring_interval
   monitoring_role_arn                   = var.monitoring_role_arn
   performance_insights_enabled          = var.performance_insights_enabled
@@ -92,6 +94,33 @@ resource "aws_rds_cluster_instance" "cluster_instances" {
     prevent_destroy = true
   }
 }
+
+resource "aws_rds_cluster_instance" "legacy_cluster_instance" {
+  // assume there is always single member instance in Aurora mysql aws_rds_cluster
+  count                                 = var.imported_from_legacy_broker ? 1 : 0
+  # the legacy broker always provision one cluster instance with the name identical to the cluster
+  identifier                            = "${var.instance_name}"
+  cluster_identifier                    = aws_rds_cluster.cluster.id
+  tags                                  = var.labels
+  instance_class                        = var.instance_class
+  engine                                = aws_rds_cluster.cluster.engine
+  engine_version                        = aws_rds_cluster.cluster.engine_version
+  db_subnet_group_name                  = local.subnet_group
+  auto_minor_version_upgrade            = var.auto_minor_version_upgrade
+  copy_tags_to_snapshot                 = var.copy_tags_to_snapshot
+  monitoring_interval                   = var.monitoring_interval
+  monitoring_role_arn                   = var.monitoring_role_arn
+  performance_insights_enabled          = var.performance_insights_enabled
+  performance_insights_kms_key_id       = var.performance_insights_kms_key_id == "" ? null : var.performance_insights_kms_key_id
+  performance_insights_retention_period = var.performance_insights_enabled ? var.performance_insights_retention_period : null
+  preferred_maintenance_window          = local.preferred_maintenance_window
+  apply_immediately                     = true
+
+  lifecycle {
+    prevent_destroy = true
+  }
+}
+
 
 resource "aws_cloudwatch_log_group" "this" {
   for_each = local.log_groups
